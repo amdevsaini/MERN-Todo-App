@@ -13,11 +13,11 @@ mongoose.connect(mongoURI);
 const db = mongoose.connection;
 db.on('error', (error) => {
     console.error('MongoDB connection error:', error);
-  });
-  
-  db.once('open', () => {
+});
+
+db.once('open', () => {
     console.log('Connected to MongoDB successfully');
-  });
+});
 
 app.post("/todo", async (req, res) => {
     const createPayload = req.body;
@@ -49,7 +49,7 @@ app.post("/todo", async (req, res) => {
 })
 
 app.get("/todos", async (req, res) => {
-    const todos = await todo.find({})
+    const todos = await todo.find({ completed: false })
     return res.json({
         todos
     })
@@ -70,10 +70,10 @@ app.put("/completed", async (req, res) => {
         completed: true
     })
 
-    console.log("Data has been updated", updateData );
+    console.log("Data has been updated", updateData);
     if (updateData) {
         res.json({
-            message: "Todo has been completed."    
+            message: "Todo has been completed."
         })
     }
 })
