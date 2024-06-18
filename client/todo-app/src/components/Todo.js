@@ -1,14 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { addTodo, getTodo, deleteTodo } from '../utils/routing';
+import { addTodo, getTodo, deleteTodo, updateTodo } from '../utils/routing';
 
 const Todo = () => {
   const [isAdded, setIsAdded] = useState(false);
   const [error, setError] = useState(false);
   const [allTodo, setAllTodo] = useState([]);
   const [view, setView] = useState(false);
+  const [currentTodo, setCurrentTodo] = useState(null);
 
   const handleAdd = () => {
     setView(!view);
+    setCurrentTodo(null);
+    if (title.current && description.current) {
+      title.current.value = '';
+      description.current.value = '';
+    }
   }
 
   const title = useRef(null);
@@ -53,14 +59,38 @@ const Todo = () => {
     setIsAdded(true);
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
+    if (!title?.current?.value || !description?.current?.value) {
+      setError('Please Enter the details.');
+    } else if (currentTodo){
+      handleUpdate();
+      } else handleApiCall(title?.current?.value, description?.current?.value);
+    }
+
+  const handleUpdate = async () => {
     if (!title?.current?.value || !description?.current?.value) {
       setError('Please Enter the details.');
     } else {
-      handleApiCall(title?.current?.value, description?.current?.value);
+      const data = await updateTodo(currentTodo._id, title.current.value, description.current.value);
+      if (data.success) {
+        setIsAdded(true);
+        setCurrentTodo(null);
+        setView(true);
+      }
     }
-
   }
+
+  const handleEdit = (todo) => {
+    setCurrentTodo(todo);
+    setView(false);
+  }
+
+  useEffect(() => {
+    if (currentTodo) {
+      title.current.value = currentTodo.title;
+      description.current.value = currentTodo.description;
+    }
+  }, [currentTodo]);
 
   return (
     <div className="relative w-1/2 my-20 p-10 bg-black mx-auto text-white bg-opacity-80 rounded-lg mb-4">
@@ -77,7 +107,11 @@ const Todo = () => {
               <br />
               <br />
             </div>
-            <div>
+            <div className='flex'>
+              <button className='mx-4 h-14' onClick={() => handleEdit(ele)}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+              </svg>
+              </button>
               <button onClick={() => completeTodo(ele._id)} className="p-2 my-1 bg-red-700 w-full rounded-lg h-12">Mark as Complete</button>
             </div>
           </div>
@@ -114,9 +148,8 @@ const Todo = () => {
             placeholder="Write your thoughts here..."
           ></textarea>
           <p className='text-red-500 text-xs my-2'>{error}</p>
-          <button onClick={handleSubmit} className="p-2 my-1 bg-red-700 w-full rounded-lg h-12">Add todo</button> </>}
+          <button onClick={handleSubmit} className="p-2 my-1 bg-red-700 w-full rounded-lg h-12">{currentTodo ? 'Update Todo' : 'Add Todo'}</button> </>}
     </div>
   );
-};
-
+}
 export default Todo;

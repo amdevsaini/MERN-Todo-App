@@ -1,4 +1,4 @@
-import { addTodoUrl, getTodoUrl, deleteTodoUrl } from "../CONSTANTS";
+import { addTodoUrl, getTodoUrl, deleteTodoUrl, updateTodoUrl } from "../CONSTANTS";
 
 export const addTodo = async (title, description) => {
     const response = await fetch(addTodoUrl, {
@@ -33,6 +33,22 @@ export const deleteTodo = async (titleId) => {
         },
         body: JSON.stringify({
             _id: titleId
+        })
+    })
+
+    return await response.json();
+}
+
+export const updateTodo = async (id, title, description) => {
+    const response = await fetch(updateTodoUrl, {
+        method: "PATCH",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            _id: id,
+            title,
+            description
         })
     })
 
