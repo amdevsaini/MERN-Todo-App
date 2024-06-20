@@ -102,7 +102,7 @@ const Todo = () => {
         allTodo.map(ele =>
           <div className='flex justify-between'>
             <div>
-              <p>{ele.title}</p>
+              <p className='text-2xl font-bold'>{ele.title}</p>
               <p>{ele.description}</p>
               <br />
               <br />
